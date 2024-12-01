@@ -10,7 +10,7 @@
     name: "dockeruser"
     state: present
 
-- name: Create users and add to groups
+- name: Create users and add to groups with password
   ansible.builtin.user:
     name: "{{ item }}"
     groups: "982,dockeruser"
@@ -18,9 +18,11 @@
     home: "/home/{{ item }}"
     create_home: true
     shell: "/bin/bash"
+    password: "{{ 'default-password' | password_hash('sha512') }}"
   loop:
     - dmorgaleva
     - vroskolotko
+
 
 - name: Generate SSH keys for users
   ansible.builtin.openssh_keypair:
