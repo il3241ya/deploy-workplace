@@ -1,0 +1,28 @@
+---
+- name: Deploy Infrastructure Components
+  hosts: target_ubuntu
+  become: true
+  vars_files:
+    - ./vars/main.yml
+    - ./secrets.yml
+
+  tasks:
+    - name: Ask if we should install base packages
+      ansible.builtin.pause:
+        prompt: "Do you want to install base packages? (yes/no)"
+      register: install_base_packages
+
+    - name: Ask if we should install rootless Docker
+      ansible.builtin.pause:
+        prompt: "Do you want to install rootless Docker? (yes/no)"
+      register: install_rootless_docker
+
+    - name: Run install-base-pckgs role if user agreed
+      ansible.builtin.include_role:
+        name: install-base-pckgs
+      when: install_base_packages.user_input == 'yes'
+
+    - name: Run rootless-docker role if user agreed
+      ansible.builtin.include_role:
+        name: rootless-docker
+      when: install_rootless_docker.user_input == 'yes'
